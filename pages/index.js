@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import clientPromise from '../lib/mongodb'
 
-export default function Home({ isConnected }) {
+const Home = ({ isConnected }) => {
   return (
     <div className="container">
       <Head>
@@ -220,9 +220,9 @@ export default function Home({ isConnected }) {
       `}</style>
     </div>
   )
-}
+};
 
-export async function getServerSideProps(context) {
+const getServerSideProps = async (context) => {
   try {
     // client.db() will be the default database passed in the MONGODB_URI
     // You can change the database by calling the client.db() function and specifying a database like:
@@ -240,3 +240,6 @@ export async function getServerSideProps(context) {
     }
   }
 }
+
+export { getServerSideProps };
+export default Home;
