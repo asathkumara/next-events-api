@@ -16,12 +16,19 @@ import {getAll, createGroup} from "../../../lib/repositories/GroupRepository";
  *
  * /api/groups:
  *   get:
+ *     summary: Returns all the groups
  *     description: Returns all the groups
+ *     tags:
+ *       - Group
  *     responses:
  *       200:
  *         description: Groups were retrieved successfully.
+ *
  *   post:
+ *     summary: Creates a new group
  *     description: Creates a new group
+ *     tags:
+ *       - Group
  *     requestBody:
  *       description:
  *       required: true

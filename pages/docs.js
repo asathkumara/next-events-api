@@ -17,7 +17,7 @@ export const getStaticProps = async (context) => {
                 contact: {
                     name: "Asel S"
                 }
-            },
+            }
         },
     });
     return {
