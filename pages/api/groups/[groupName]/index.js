@@ -1,22 +1,32 @@
-import clientPromise from "../../../../lib/mongodb";
+import {addMember, getGroupMembers, removeMember} from "../../../../lib/repositories/GroupRepository";
 
 const handler = async (request, response) => {
-    let client = await clientPromise;
-    let db = await client.db("GroupBy");
+    let result = {acknowledged: false, message: "Only GET / PATCH / DELETE permitted."};
+    let {groupName} = request.query;
 
-    let { groupName } = request.query;
-    let group = {name: groupName};
-
-    let groupMembers = await db.collection("Groups")
-        .find(group)
-        .toArray();
-
-    if (groupMembers)
+    switch (request.method)
     {
-        groupMembers = groupMembers[0].members;
-    }
+        case "GET":
+            let groupMembers = await getGroupMembers({name: groupName});
+            response.status(200).json(groupMembers);
+            break;
 
-    response.status(200).json(groupMembers);
+        /**
+         * Throws error when id is not BSON
+         */
+        case "PATCH":
+            result = await addMember(request.body.id, groupName);
+            response.status(200).json(result);
+            break;
+
+        case "DELETE":
+            result = await removeMember(request.body.id, groupName);
+            response.status(200).json(result);
+            break;
+
+        default:
+            response.status(405).json(result);
+    }
 };
 
 export default handler;
