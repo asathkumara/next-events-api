@@ -1,5 +1,43 @@
 import {getAll, createGroup} from "../../../lib/repositories/GroupRepository";
 
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Group:
+ *       type: object
+ *       properties:
+ *         userID:
+ *           type: string
+ *           description: The BSON ID of the user creating the group
+ *         name:
+ *           type: string
+ *           description: The name for the group being created
+ *
+ * /api/groups:
+ *   get:
+ *     description: Returns all the groups
+ *     responses:
+ *       200:
+ *         description: Groups were retrieved successfully.
+ *   post:
+ *     description: Creates a new group
+ *     requestBody:
+ *       description:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: "#/components/schemas/Group"
+ *           example:
+ *             userID: 6224fe098c103c8a0a8f1859
+ *             name: cs380
+ *     responses:
+ *       201:
+ *         description: Group was created successfully.
+ *
+ *
+ *  */
 const handler = async (request, response) => {
     let result = {acknowledged: false, message: "Only GET / POST permitted."};
 
