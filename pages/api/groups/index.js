@@ -4,15 +4,7 @@ import {getAll, createGroup} from "../../../lib/repositories/GroupRepository";
  * @swagger
  * components:
  *   schemas:
- *     Group:
- *       type: object
- *       properties:
- *         userID:
- *           type: string
- *           description: The BSON ID of the user creating the group
- *         name:
- *           type: string
- *           description: The name for the group being created
+
  *
  * /api/groups:
  *   get:

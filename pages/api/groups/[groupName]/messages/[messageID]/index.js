@@ -9,7 +9,7 @@ import {editMessage} from "../../../../../../lib/repositories/MessageRepository"
  *     summary: Edit a message
  *     description: Edit a message
  *     tags:
- *       - Group
+ *       - Message
  *     parameters:
  *       - in: path
  *         name: groupName

@@ -3,24 +3,12 @@ import {addMessage, getGroupMessages} from "../../../../../lib/repositories/Grou
 
 /**
  * @swagger
- * components:
- *   schemas:
- *     Message:
- *       type: object
- *       properties:
- *         userID:
- *           type: string
- *           description: The BSON ID of the user sending the message
- *         contents:
- *           type: string
- *           description: The message contents
- *
  * /api/groups/{groupName}/messages:
  *   get:
  *     summary: Returns all the messages sent to the group
  *     description: Returns all the messages sent to the group
  *     tags:
- *       - Group
+ *       - Message
  *     parameters:
  *       - in: path
  *         name: groupName
@@ -36,7 +24,7 @@ import {addMessage, getGroupMessages} from "../../../../../lib/repositories/Grou
  *     summary: Creates a new message
  *     description: Creates a new message
  *     tags:
- *       - Group
+ *       - Message
  *     parameters:
  *       - in: path
  *         name: groupName

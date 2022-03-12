@@ -2,14 +2,6 @@ import {addMember, getGroupMembers, removeMember} from "../../../../lib/reposito
 
 /**
  * @swagger
- * components:
- *   schemas:
- *     GroupMember:
- *       type: object
- *       properties:
- *         userID:
- *           type: string
- *           description: The BSON ID of the group member to be added/removed.
  *
  * /api/groups/{groupName}:
  *   get:
@@ -45,7 +37,7 @@ import {addMember, getGroupMembers, removeMember} from "../../../../lib/reposito
  *       content:
  *         application/json:
  *           schema:
- *             $ref: "#/components/schemas/GroupMember"
+ *             $ref: "#/components/schemas/User"
  *           example:
  *             userID: 6224fe098c103c8a0a8f1859
  *     responses:
@@ -70,7 +62,7 @@ import {addMember, getGroupMembers, removeMember} from "../../../../lib/reposito
  *       content:
  *         application/json:
  *           schema:
- *             $ref: "#/components/schemas/GroupMember"
+ *             $ref: "#/components/schemas/User"
  *           example:
  *             userID: 6224fe098c103c8a0a8f1859
  *     responses:
