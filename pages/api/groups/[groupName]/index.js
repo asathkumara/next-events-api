@@ -1,6 +1,6 @@
-import {addMember, getGroupMembers, removeMember} from "../../../../lib/repositories/GroupRepository";
-import {getBy} from "../../../../lib/repositories/UserRepository";
 import {ObjectId} from "mongodb";
+import Group from "../../../../lib/models/Group";
+import User from "../../../../lib/models/User";
 
 /**
  * @swagger
@@ -74,37 +74,51 @@ import {ObjectId} from "mongodb";
 const handler = async (request, response) => {
     let result = {acknowledged: false, message: "Only GET / PATCH / DELETE permitted."};
     let { groupName } = request.query;
+    let group = await Group.findOne({name: groupName});
 
-    switch (request.method)
+    try
     {
-        case "GET":
-            let groupMemberIDs = await getGroupMembers({name: groupName});
-            let groupMembers = [];
+        switch (request.method)
+        {
+            case "GET":
 
-            for (let memberID of groupMemberIDs) {
-                let member = await getBy({_id: new ObjectId(memberID)});
-                groupMembers.push(member);
-            }
+                let groupMembers = [];
 
-            response.status(200).json(groupMembers);
-            break;
+                for (let memberID of group.members)
+                {
+                    let member =  await User.findById({_id: new ObjectId(memberID)});
+                    groupMembers.push(member);
+                }
 
-        /**
-         * Throws error when id is not BSON
-         */
-        case "PATCH":
-            result = await addMember(request.body.userID, groupName);
-            response.status(200).json(result);
-            break;
+                response.status(200).json(groupMembers);
+                break;
 
-        case "DELETE":
-            result = await removeMember(request.body.userID, groupName);
-            response.status(200).json(result);
-            break;
+            case "PATCH":
+                result = await Group.findByIdAndUpdate(
+                    {_id: group._id},
+                    {$push: {members: new ObjectId(request.body.userID)}},
+                    {new: true});
+                response.status(200).json(result);
+                break;
 
-        default:
-            response.status(405).json(result);
+            case "DELETE":
+                result = await Group.findByIdAndUpdate(
+                    {_id: group._id},
+                    {$pull: {members: new ObjectId(request.body.userID)}},
+                    {new: true});
+                response.status(200).json(result);
+                break;
+
+            default:
+                response.status(405).json(result);
+        }
     }
+    catch (exception)
+    {
+        result.message = exception.message;
+        response.status(404).json(result);
+    }
+
 };
 
 export default handler;

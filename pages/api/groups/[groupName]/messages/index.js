@@ -1,6 +1,6 @@
-import {createMessage, getBy} from "../../../../../lib/repositories/MessageRepository";
-import {addMessage, getGroupMessages} from "../../../../../lib/repositories/GroupRepository";
 import {ObjectId} from "mongodb";
+import Group from "../../../../../lib/models/Group";
+import Message from "../../../../../lib/models/Message";
 /**
  * @swagger
  * /api/groups/{groupName}/messages:
@@ -52,35 +52,44 @@ const handler = async (request, response) => {
 
     let result = {acknowledged: false, message: "Only GET / POST permitted."};
     let { groupName } = request.query;
+    let group = await Group.findOne({name: groupName});
 
-    /**
-     * TO-DO: Parse message ids from get group messages to actual messages.
-     */
-    switch (request.method)
+    try
     {
-        case "GET":
-            let messageIDs = await getGroupMessages({name: groupName});
-            let messages = [];
+        switch (request.method)
+        {
+            case "GET":
+                let groupMessages = [];
 
-            for (let messageID of messageIDs)
-            {
-                let message = await getBy({_id: new ObjectId(messageID)});
-                messages.push(message);
-            }
+                for (let messageID of group.messages)
+                {
+                    let message = await Message.findById({_id: new ObjectId(messageID)});
+                    groupMessages.push(message);
+                }
 
-            response.status(200).json(messages);
-            break;
+                response.status(200).json(groupMessages);
+                break;
 
-        case "POST":
-            let { insertedId } = await createMessage(request.body);
-            result = await addMessage(insertedId, groupName);
+            case "POST":
+                result = await Message.create(request.body);
+                await Group.findByIdAndUpdate(
+                    {_id: group._id},
+                    {$push: {messages: new ObjectId(result._id)}},
+                    {new: true});
 
-            response.status(201).json(result);
-            break;
+                response.status(201).json(result);
+                break;
 
-        default:
-            response.status(405).json(result);
+            default:
+                response.status(405).json(result);
+        }
     }
+    catch (exception)
+    {
+        result.message = exception.message;
+        response.status(404).json(result);
+    }
+
 };
 
 export default handler;

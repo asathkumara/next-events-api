@@ -1,7 +1,6 @@
-import {createEvent, editEvent, getBy, removeEvent} from "../../../../../lib/repositories/EventRepository";
-import {removeGroupEvent} from "../../../../../lib/repositories/GroupRepository";
 import {ObjectId} from "mongodb";
-
+import Group from "../../../../../lib/models/Group";
+import Event from "../../../../../lib/models/Event";
 /**
  * @swagger
  * /api/groups/{groupName}/events/{eventID}:
@@ -84,31 +83,46 @@ import {ObjectId} from "mongodb";
  *  */
 const handler = async (request, response) => {
     let result = {acknowledged: false, message: "Only GET / PATCH / DELETE permitted."};
-    let { groupName, eventID } = request.query;
+    let {groupName, eventID} = request.query;
+    let group = await Group.findOne({name: groupName});
 
-    switch (request.method)
+    try
     {
-        case "GET":
-            let events = await getBy({_id: new ObjectId(eventID)});
-            response.status(200).json(events);
-            break;
+        switch (request.method)
+        {
+            case "GET":
+                result = await Event.findById({_id: new ObjectId(eventID)})
+                response.status(200).json(result);
+                break;
 
-        case "PATCH":
-            result = await editEvent(eventID, request.body);
-            response.status(200).json(result);
-            break;
+            case "PATCH":
+                result = await Event.findByIdAndUpdate(
+                    {_id: new ObjectId(eventID)},
+                    request.body,
+                    {new: true});
 
-        case "DELETE":
-            result = await removeEvent(eventID);
-            // result = await removeGroupEvent(eventID, groupName);
+                response.status(200).json(result);
+                break;
 
-            response.status(200).json(result);
-            break;
+            case "DELETE":
+                await Group.findByIdAndUpdate(
+                    {_id: group._id},
+                    {$pull: {events: new ObjectId(eventID)}},
+                    {new: true});
 
-        default:
-            response.status(405).json(result);
+                result = await Event.findByIdAndDelete({_id: new ObjectId(eventID)});
+                response.status(200).json(result);
+                break;
+
+            default:
+                response.status(405).json(result);
+        }
     }
-
+    catch (exception)
+    {
+        result.message = exception.message;
+        response.status(404).json(result);
+    }
 };
 
 export default handler;

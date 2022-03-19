@@ -1,4 +1,5 @@
-import {getAll, createGroup} from "../../../lib/repositories/GroupRepository";
+import Group from "../../../lib/models/Group";
+import {ObjectId} from "mongodb";
 
 /**
  * @swagger
@@ -36,22 +37,30 @@ import {getAll, createGroup} from "../../../lib/repositories/GroupRepository";
 const handler = async (request, response) => {
     let result = {acknowledged: false, message: "Only GET / POST permitted."};
 
-    switch (request.method)
+    try
     {
-        case "GET":
-            let groups = await getAll();
-            response.status(200).json(groups);
-            break;
+        switch (request.method)
+        {
+            case "GET":
+                result = await Group.find({});
+                response.status(200).json(result);
+                break;
 
-        case "POST":
-            result = await createGroup(request.body);
-            response.status(201).json(result);
-            break;
+            case "POST":
+                request.body["members"] = [new ObjectId(request.body.userID)];
+                result = await Group.create(request.body);
+                response.status(201).json(result);
+                break;
 
-        default:
-            response.status(405).json(result);
+            default:
+                response.status(405).json(result);
+        }
     }
-
+    catch (exception)
+    {
+        result.message = exception.message;
+        response.status(404).json(result);
+    }
 };
 
 export default handler;

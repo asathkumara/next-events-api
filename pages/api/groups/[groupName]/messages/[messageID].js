@@ -1,4 +1,5 @@
-import {editMessage} from "../../../../../lib/repositories/MessageRepository";
+import {ObjectId} from "mongodb";
+import Message from "../../../../../lib/models/Message";
 
 /**
  * @swagger
@@ -41,19 +42,31 @@ import {editMessage} from "../../../../../lib/repositories/MessageRepository";
 const handler = async (request, response) => {
 
     let result = {acknowledged: false, message: "Only PATCH permitted."};
+    let { messageID } = request.query;
 
-    switch (request.method)
+    try
     {
-        case "PATCH":
-            let { messageID } = request.query;
-            result = await editMessage(messageID, request.body.contents);
+        switch (request.method)
+        {
+            case "PATCH":
+                result = await Message.findByIdAndUpdate(
+                    {_id: new ObjectId(messageID)},
+                    {$set: {contents: request.body.contents}},
+                    {new: true});
 
-            response.status(200).json(result);
-            break;
+                response.status(200).json(result);
+                break;
 
-        default:
-            response.status(405).json(result);
+            default:
+                response.status(405).json(result);
+        }
     }
+    catch (exception)
+    {
+        result.message = exception.message;
+        response.status(404).json(result);
+    }
+
 };
 
 export default handler;

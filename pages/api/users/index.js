@@ -1,4 +1,4 @@
-import {createUser, getAll} from "../../../lib/repositories/UserRepository";
+import User from "../../../lib/models/User";
 
 /**
  * @swagger
@@ -59,21 +59,30 @@ import {createUser, getAll} from "../../../lib/repositories/UserRepository";
 const handler = async (request, response) => {
     let result = {acknowledged: false, message: "Only GET / POST permitted."};
 
-    switch (request.method)
+    try
     {
-        case "GET":
-            result = await getAll();
-            response.status(200).json(result);
-            break;
+        switch (request.method)
+        {
+            case "GET":
+                result = await User.find({});
+                response.status(200).json(result);
+                break;
 
-        case "POST":
-            result = await createUser(request.body);
-            response.status(201).json(result);
-            break;
+            case "POST":
+                result = await User.create(request.body);
+                response.status(201).json(result);
+                break;
 
-        default:
-            response.status(405).json(result);
+            default:
+                response.status(405).json(result);
+        }
     }
+    catch (exception)
+    {
+        result.message = exception.message;
+        response.status(404).json(result);
+    }
+
 
 };
 

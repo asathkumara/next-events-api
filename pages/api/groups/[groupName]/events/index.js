@@ -1,6 +1,6 @@
-import {createEvent, getBy, removeEvent} from "../../../../../lib/repositories/EventRepository";
-import {addEvent, getGroupEvents, getGroupMembers} from "../../../../../lib/repositories/GroupRepository";
 import {ObjectId} from "mongodb";
+import Event from "../../../../../lib/models/Event";
+import Group from "../../../../../lib/models/Group";
 
 /**
  * @swagger
@@ -41,7 +41,7 @@ import {ObjectId} from "mongodb";
  *           schema:
  *             $ref: "#/components/schemas/Event"
  *           example:
- *             userID: 6224fe098c103c8a0a8f1859
+ *             createdBy: 6224fe098c103c8a0a8f1859
  *             name: "Homework 5 Party"
  *             startsAt: "3/15/2022, 2:30:00 PM"
  *             endsAt: "3/15/2022, 2:30:00 PM"
@@ -54,31 +54,43 @@ import {ObjectId} from "mongodb";
 const handler = async (request, response) => {
     let result = {acknowledged: false, message: "Only GET / POST permitted."};
     let { groupName } = request.query;
+    let group = await Group.findOne({name: groupName});
 
-    switch (request.method)
+    try
     {
-        case "GET":
-            let groupEventIDs = await getGroupEvents({name: groupName});
-            let groupEvents = [];
+        switch (request.method)
+        {
+            case "GET":
+                let groupEvents = [];
 
-            for (let eventID of groupEventIDs) {
-                let event = await getBy({_id: new ObjectId(eventID)});
-                groupEvents.push(event);
-            }
+                for (let eventID of group.events)
+                {
+                    let event =  await Event.findById({_id: new ObjectId(eventID)});
+                    groupEvents.push(event);
+                }
 
-            response.status(200).json(groupEvents);
-            break;
+                response.status(200).json(groupEvents);
+                break;
 
-        case "POST":
-            let { insertedId } = await createEvent(request.body);
-            result = await addEvent(insertedId, groupName);
-            response.status(201).json(result);
-            break;
+            case "POST":
+                result = await Event.create(request.body);
+                await Group.findByIdAndUpdate(
+                    {_id: group._id},
+                    {$push: {events: new ObjectId(result._id)}},
+                    {new: true});
 
-        default:
-            response.status(405).json(result);
+                response.status(201).json(result);
+                break;
+
+            default:
+                response.status(405).json(result);
+        }
     }
-
+    catch (exception)
+    {
+        result.message = exception.message;
+        response.status(404).json(result);
+    }
 };
 
 export default handler;

@@ -1,5 +1,5 @@
-import {getBy, getAll, editUser} from "../../../lib/repositories/UserRepository";
 import {ObjectId} from "mongodb";
+import User from "../../../lib/models/User";
 
 /**
  * @swagger
@@ -50,24 +50,36 @@ import {ObjectId} from "mongodb";
  *  */
 const handler = async (request, response) => {
     let result = {acknowledged: false, message: "Only GET / PATCH permitted."};
-    let { userID } = request.query;
+    let {userID} = request.query;
 
-    switch (request.method)
+    try
     {
-        case "GET":
-            result = await getBy({_id: new ObjectId(userID)});
-            response.status(200).json(result);
-            break;
+        switch (request.method) {
+            case "GET":
+                // result = await getBy({_id: new ObjectId(userID)});
+                // response.status(200).json(result);
 
-        case "PATCH":
-            result = await editUser(userID, request.body);
-            response.status(200).json(result);
-            break;
+                result = await User.findById({_id: new ObjectId(userID)});
+                response.status(200).json(result);
+                break;
 
-        default:
-            response.status(405).json(result);
+            case "PATCH":
+                // result = await editUser(userID, request.body);
+                // response.status(200).json(result);
+
+                result = await User.findByIdAndUpdate({_id: new ObjectId(userID)}, request.body, {new: true});
+                response.status(200).json(result);
+                break;
+
+            default:
+                response.status(405).json(result);
+        }
     }
-
+    catch (exception)
+    {
+        result.message = exception.message;
+        response.status(404).json(result);
+    }
 };
 
 export default handler;
