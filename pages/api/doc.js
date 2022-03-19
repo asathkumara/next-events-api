@@ -55,6 +55,22 @@ import { withSwagger } from 'next-swagger-doc';
  *         contents:
  *           type: string
  *           description: The message contents
+ *
+ *     Event:
+ *       type: object
+ *       properties:
+ *         createdBy:
+ *           type: string
+ *           description: The BSON ID of the user who created the event
+ *         name:
+ *           type: string
+ *           description: The name of the event
+ *         startsAt:
+ *           type: string
+ *           description: The timestamp for the event's starting time
+ *         endsAt:
+ *           type: string
+ *           description: The timestamp for the event's ending time
  */
 const swaggerHandler = withSwagger({
     definition: {
