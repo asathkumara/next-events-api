@@ -2,10 +2,6 @@ import {getAll, createGroup} from "../../../lib/repositories/GroupRepository";
 
 /**
  * @swagger
- * components:
- *   schemas:
-
- *
  * /api/groups:
  *   get:
  *     summary: Returns all the groups

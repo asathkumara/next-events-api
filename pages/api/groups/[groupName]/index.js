@@ -1,4 +1,6 @@
 import {addMember, getGroupMembers, removeMember} from "../../../../lib/repositories/GroupRepository";
+import {getBy} from "../../../../lib/repositories/UserRepository";
+import {ObjectId} from "mongodb";
 
 /**
  * @swagger
@@ -19,7 +21,7 @@ import {addMember, getGroupMembers, removeMember} from "../../../../lib/reposito
  *     responses:
  *       200:
  *         description: Group members were retrieved successfully.
- *   post:
+ *   patch:
  *     summary: Add a new member to the group.
  *     description: Add a new member to the group.
  *     tags:
@@ -71,12 +73,19 @@ import {addMember, getGroupMembers, removeMember} from "../../../../lib/reposito
  *  */
 const handler = async (request, response) => {
     let result = {acknowledged: false, message: "Only GET / PATCH / DELETE permitted."};
-    let {groupName} = request.query;
+    let { groupName } = request.query;
 
     switch (request.method)
     {
         case "GET":
-            let groupMembers = await getGroupMembers({name: groupName});
+            let groupMemberIDs = await getGroupMembers({name: groupName});
+            let groupMembers = [];
+
+            for (let memberID of groupMemberIDs) {
+                let member = await getBy({_id: new ObjectId(memberID)});
+                groupMembers.push(member);
+            }
+
             response.status(200).json(groupMembers);
             break;
 
@@ -84,12 +93,12 @@ const handler = async (request, response) => {
          * Throws error when id is not BSON
          */
         case "PATCH":
-            result = await addMember(request.body.id, groupName);
+            result = await addMember(request.body.userID, groupName);
             response.status(200).json(result);
             break;
 
         case "DELETE":
-            result = await removeMember(request.body.id, groupName);
+            result = await removeMember(request.body.userID, groupName);
             response.status(200).json(result);
             break;
 
