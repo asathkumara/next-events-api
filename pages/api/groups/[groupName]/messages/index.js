@@ -1,6 +1,6 @@
-import {createMessage, getAll} from "../../../../../lib/repositories/MessageRepository";
+import {createMessage, getBy} from "../../../../../lib/repositories/MessageRepository";
 import {addMessage, getGroupMessages} from "../../../../../lib/repositories/GroupRepository";
-
+import {ObjectId} from "mongodb";
 /**
  * @swagger
  * /api/groups/{groupName}/messages:
@@ -59,8 +59,17 @@ const handler = async (request, response) => {
     switch (request.method)
     {
         case "GET":
-            let messages = await getGroupMessages({name: groupName});
+            let messageIDs = await getGroupMessages({name: groupName});
+            let messages = [];
+
+            for (let messageID of messageIDs)
+            {
+                let message = await getBy({_id: new ObjectId(messageID)});
+                messages.push(message);
+            }
+
             response.status(200).json(messages);
+            break;
 
         case "POST":
             let { insertedId } = await createMessage(request.body);
