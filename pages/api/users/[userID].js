@@ -44,8 +44,8 @@ import {ObjectId} from "mongodb";
  *             interests: ["Cinematography", "Hiking"]
  *             active: false
  *     responses:
- *       201:
- *         description: Member was added to the group successfully.
+ *       200:
+ *         description: User was updated successfully.
  *
  *  */
 const handler = async (request, response) => {
