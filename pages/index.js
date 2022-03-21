@@ -6,7 +6,7 @@ const ApiDoc = ({ spec }) => {
     return <SwaggerUI spec={spec} />;
 };
 
-export const getServerSideProps = async (context) => {
+export const getStaticProps = async (context) => {
     const spec = createSwaggerSpec({
         definition: {
             openapi: '3.0.0',
