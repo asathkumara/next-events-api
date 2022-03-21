@@ -2,29 +2,6 @@ import User from "../../../lib/models/User";
 
 /**
  * @swagger
- * components:
- *   schemas:
- *     User:
- *       type: object
- *       properties:
- *         _ID:
- *           type: string
- *           description: The BSON ID of the user. [Generated value]
- *         name:
- *           type: string
- *           description: The name of the user.
- *         joinedAt:
- *           type: string
- *           description: The timestamp for the account creation.
- *         interests:
- *           type: array
- *           items:
- *             type: string
- *           description: A list of the user's interests.
- *         active:
- *           type: boolean
- *           description: Indicates whether the user is active.
- *
  *
  * /api/users/:
  *   get:
