@@ -22,6 +22,8 @@
     </tr>    
 </table>
 
+> The documentation for the REST API and the Swagger interface is available at https://next-events-api.vercel.app/
+
 ## Table of Contents
 
 1. [Overview](#overview)
@@ -37,7 +39,7 @@ Note: If a request throws a 500, chances are the MongoDB cluster is inactive.
 
 ## Get Started
 
-Let's start by creating your first  group. First, you need to create a user. Open up a command prompt and enter the following command:
+Let's start by creating your first  group. First you need to create a user. Open up a command prompt and enter the following command:
 
 
 ```bash
@@ -83,7 +85,7 @@ $ curl --location --request POST 'https://next-events-api.vercel.app/api/groups'
 > }
 ```
 
-Congrats, you're now the first member of the "Dev" group. Now you're able to send messages to the group and host events.
+Congrats, you're now the first member of the "Dev" group! You're now able to send messages to the group and host events.
 
 Let's try posting a message to the "Dev" group:
 
